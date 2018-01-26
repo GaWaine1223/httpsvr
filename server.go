@@ -58,7 +58,6 @@ func (s *Server) AddRoute(method, path string, ctrl IController) {
 		// http框架虽然会panic-recover但是自己也必须recover，因为接入记录panic后不会正常消去
 		defer func() {
 			if err := recover(); err != nil {
-				s.ac.OutControl()
 				w.Write([]byte("Server is busy."))
 				stack := make([]byte, 2048)
 				stack = stack[:runtime.Stack(stack, false)]
@@ -72,6 +71,7 @@ func (s *Server) AddRoute(method, path string, ctrl IController) {
 			w.Write(getErrMsg(err))
 			return
 		}
+		defer s.ac.OutControl()
 		nt := time.Now()
 		// 打印输入请求
 		if s.opt.dumpAccess {
@@ -107,7 +107,6 @@ func (s *Server) AddRoute(method, path string, ctrl IController) {
 		}
 
 		do(r, w)
-		s.ac.OutControl()
 	}
 	s.router.Handle(method, path, handle)
 }
