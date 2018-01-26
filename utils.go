@@ -1,8 +1,8 @@
 package httpsvr
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 // GetClientAddr ...

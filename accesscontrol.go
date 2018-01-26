@@ -1,38 +1,55 @@
 package httpsvr
 
-import "time"
+import (
+	"errors"
+	"sync"
+	"time"
+)
 
+// Access 接入控制
 type Access struct {
 	maxAccess int
-	tk time.Ticker
-	// 输入桶
-	ibucket  chan struct{}
-	// 输出桶
-	obucket  chan struct{}
+	// 桶,用来限制最大并发数
+	bucket chan struct{}
+	// 用来判断何时桶内已空，否则需要循环判断
+	wg sync.WaitGroup
 }
 
+// NewAccessor ...
 func NewAccessor(i int) *Access {
 	var ac Access
 	ac.maxAccess = i
 	// 10ms 准入超时计时器，时间窗口
-	ac.tk = time.NewTicker(time.Millisecond * 10)
-	ac.ibucket = make(chan struct{}, i)
-	ac.obucket = make(chan struct{}, i)
-	return ac
+	ac.bucket = make(chan struct{}, i)
+	return &ac
 }
 
-func (a *Access) Run() {
-
+// Stop 退出等待
+func (a *Access) Stop() {
+	close(a.bucket)
+	// 第一种判断桶内为空
+	a.wg.Wait()
+	/*第二种判断桶内为空
+	for {
+		if len(a.bucket)== 0 {
+			return
+		}
+	}*/
 }
 
-func (a *Access) InControl(ic chan struct{}) error {
+// InControl 入口控制
+func (a *Access) InControl() error {
 	select {
-	case ic <- struct{}(1) :
-	case <- a.tk.C :
-
+	case a.bucket <- struct{}{}:
+		a.wg.Add(1)
+	case <-time.After(time.Millisecond * 100):
+		return errors.New("server is busy please try later")
 	}
+	return nil
 }
 
-func (a *Access) OutControl(oc chan struct{}) {
-
+// OutControl 出口注销
+func (a *Access) OutControl() {
+	<-a.bucket
+	a.wg.Done()
 }
