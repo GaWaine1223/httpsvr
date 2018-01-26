@@ -21,7 +21,7 @@ type Server struct {
 	router *httprouter.Router
 	opt    *option
 	oriSvr *http.Server
-	// 接入控制：1.为了限制最大并发数(chan)；2.为了优雅退出(sync.WaitGroup)
+	// 接入控制：1.为了限制最大并发数(chan)，以及关闭入口；2.为了优雅退出(sync.WaitGroup)
 	ac *Access
 }
 

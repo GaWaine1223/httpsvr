@@ -14,7 +14,7 @@ func main() {
 	s := httpsvr.New("127.0.0.1:10024",
 		httpsvr.SetReadTimeout(time.Millisecond*200),
 		httpsvr.SetWriteTimeout(time.Millisecond*200),
-		httpsvr.SetMaxAccess(1),
+		httpsvr.SetMaxAccess(2),
 	)
 	go GracefulExit(s)
 	s.AddRoute("POST", "/test/api", &ctrls.DemoCtrl{})

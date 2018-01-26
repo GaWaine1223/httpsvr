@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sync"
 	"time"
+	"sync/atomic"
 )
 
 // Access 接入控制
@@ -13,11 +14,13 @@ type Access struct {
 	bucket chan struct{}
 	// 用来判断何时桶内已空，否则需要循环判断
 	wg sync.WaitGroup
+	closed int32
 }
 
 // NewAccessor ...
 func NewAccessor(i int) *Access {
 	var ac Access
+	ac.closed = 0
 	ac.maxAccess = i
 	// 10ms 准入超时计时器，时间窗口
 	ac.bucket = make(chan struct{}, i)
@@ -26,7 +29,9 @@ func NewAccessor(i int) *Access {
 
 // Stop 退出等待
 func (a *Access) Stop() {
-	close(a.bucket)
+	if !atomic.CompareAndSwapInt32(&a.closed, 0, 1) {
+		return
+	}
 	// 第一种判断桶内为空
 	a.wg.Wait()
 	/*第二种判断桶内为空
@@ -39,6 +44,9 @@ func (a *Access) Stop() {
 
 // InControl 入口控制
 func (a *Access) InControl() error {
+	if atomic.LoadInt32(&a.closed) == 1 {
+		return errors.New("server is closing")
+	}
 	select {
 	case a.bucket <- struct{}{}:
 		a.wg.Add(1)
