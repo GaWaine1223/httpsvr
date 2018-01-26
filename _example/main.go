@@ -1,10 +1,10 @@
-package	main
+package main
 
 import (
-	"time"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/GaWaine1223/Lothar/httpsvr"
 	"github.com/GaWaine1223/Lothar/httpsvr/_example/ctrls"

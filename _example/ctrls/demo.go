@@ -1,12 +1,11 @@
 package ctrls
 
 import (
-	"github.com/GaWaine1223/Lothar/httpsvr/_example/idl"
 	"github.com/GaWaine1223/Lothar/httpsvr/_example/handler"
+	"github.com/GaWaine1223/Lothar/httpsvr/_example/idl"
 )
 
 type DemoCtrl struct {
-
 }
 
 func (c *DemoCtrl) GenIdl() interface{} {
@@ -17,7 +16,3 @@ func (c *DemoCtrl) Do(req interface{}) interface{} {
 	r := req.(*idl.DemoReq)
 	return handler.DemoHandle(r)
 }
-
-
-
-

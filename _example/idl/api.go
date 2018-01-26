@@ -1,8 +1,8 @@
 package idl
 
 type DemoReq struct {
-	Name 	string `json:"name"`
-	Age 	int	`json:"age"`
+	Name string `json:"name"`
+	Age  int    `json:"age"`
 }
 
 func NewDemoReq() *DemoReq {
@@ -10,9 +10,9 @@ func NewDemoReq() *DemoReq {
 }
 
 type DemoResp struct {
-	Errno 	int	`json:"errno"`
-	Msg 	string	`json:"msg"`
-	Result 	string	`json:"result"`
+	Errno  int    `json:"errno"`
+	Msg    string `json:"msg"`
+	Result string `json:"result"`
 }
 
 func NewDemoResp() *DemoResp {
