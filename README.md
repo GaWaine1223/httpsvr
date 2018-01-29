@@ -122,6 +122,21 @@ func (a *Access) OutControl() {
     <-a.bucket
     a.wg.Done()
 }
+
+// Stop 优雅退出
+func (a *Access) Stop() {
+	if !atomic.CompareAndSwapInt32(&a.closed, 0, 1) {
+		return
+	}
+	// 第一种判断桶内为空
+	a.wg.Wait()
+	/*第二种判断桶内为空
+	for {
+		if len(a.bucket)== 0 {
+			return
+		}
+	}*/
+}
 ```
 
 ## 测试

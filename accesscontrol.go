@@ -30,7 +30,7 @@ func NewAccessor(i int) *Access {
 	return &ac
 }
 
-// Stop 退出等待
+// Stop 优雅退出
 func (a *Access) Stop() {
 	if !atomic.CompareAndSwapInt32(&a.closed, 0, 1) {
 		return
